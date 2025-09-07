@@ -1,4 +1,4 @@
-# Network Intrusion Detection using Machine Learning
+# Intrusion Detection using Machine Learning
 
 This project develops an advanced **Intrusion Detection System (IDS)** using machine learning to safeguard computer networks. With the increasing volume of network traffic, the threat of cyber-attacks has grown significantly. This system effectively identifies and classifies network connections as either **normal** or **malicious**, providing a robust defense against intruders.
 
