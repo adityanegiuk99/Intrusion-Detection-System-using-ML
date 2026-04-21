@@ -1,0 +1,26 @@
+app:
+  name: intrusion-detection-platform
+  log_level: INFO
+
+paths:
+  dataset: data/raw/kddcup.data_10_percent_corrected
+  artifacts_dir: models/artifacts
+
+training:
+  random_state: 42
+  test_size: 0.2
+  k_best_features: 40
+  optuna_trials: 10
+  decision_threshold: 0.5
+
+monitoring:
+  drift_threshold: 0.35
+
+security:
+  rate_limit: 30/minute
+  jwt_secret: change-me-in-production-with-at-least-32-bytes
+  token_expire_minutes: 120
+
+streaming:
+  poll_interval_seconds: 1
+  sample_size: 25

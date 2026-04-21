@@ -1,85 +1,215 @@
-# Intrusion Detection using Machine Learning
+# Intrusion Detection Platform
 
-This project develops an advanced **Intrusion Detection System (IDS)** using machine learning to safeguard computer networks. With the increasing volume of network traffic, the threat of cyber-attacks has grown significantly. This system effectively identifies and classifies network connections as either **normal** or **malicious**, providing a robust defense against intruders.
+An intrusion detection project that started as a notebook-based machine learning experiment and is being rebuilt into a more production-oriented platform for batch scoring, API inference, dashboard review, and operational hardening.
 
-The project leverages the well-known **KDD '99 dataset** and employs an ensemble of machine learning models to achieve high accuracy and a low rate of false positives.
+This repository is intentionally presented as an engineering-in-progress project rather than a finished enterprise product. The goal is to show real system design, iterative improvement, and honest productionization work on top of a classical IDS dataset.
 
------
+## Project Goal
 
-## About The Project
+The project aims to detect malicious network traffic using machine learning and expose the model through a usable application stack:
 
-The core objective of this project is to build a highly accurate classifier for network intrusions. This is achieved through a systematic, multi-stage process that includes data preprocessing, exploratory analysis, model training, and a sophisticated ensemble technique to combine the strengths of multiple algorithms.
+- a reproducible training pipeline
+- a FastAPI inference service
+- a Streamlit analyst dashboard
+- basic monitoring and drift checks
+- Docker-based local deployment
 
-### Key Features
+The longer-term objective is to move from offline dataset classification toward a more realistic security analytics workflow with stronger validation, observability, and deployment discipline.
 
-  * **Comprehensive Data Preprocessing**: The dataset undergoes rigorous cleaning, transformation of symbolic features to numeric ones, and feature selection to ensure the data is clean and non-redundant.
-  * **In-Depth Exploratory Data Analysis (EDA)**: Visual tools like **PCA (Principal Component Analysis)** and **t-SNE (t-Distributed Stochastic Neighbor Embedding)** are used to gain a deep understanding of the data's structure and the relationships between different features.
-  * **Multiple Classifier Implementation**: Three powerful and distinct machine learning models are trained and evaluated:
-      * **Gaussian Naive Bayes**
-      * **Decision Tree**
-      * **XGBoost**
-  * **Advanced Ensemble Modeling**: A **max-voting ensemble** method is used to aggregate the predictions from the individual models. This approach leverages the diversity of the classifiers to produce a more accurate and reliable final prediction.
+## What This Repository Currently Contains
 
------
+- Config-driven preprocessing, feature engineering, feature selection, and SMOTE-based class balancing
+- Model comparison across Random Forest, XGBoost, LightGBM, and a soft-voting ensemble
+- FastAPI endpoints for health, single prediction, batch prediction, metrics, and token generation
+- A Streamlit dashboard for analyst review and batch triage
+- A streaming simulator that replays records through the shared inference layer
+- Basic drift scoring based on feature distribution shifts
+- Docker, CI, linting, and pytest scaffolding
 
-## Models and Techniques
+## Architecture
 
-This project employs a variety of techniques to achieve its goal.
+```text
+Dataset / CSV stream
+        |
+        v
++--------------------+
+| Preprocessing      |
+| feature engineering|
+| selection + SMOTE  |
++---------+----------+
+          |
+          v
++--------------------+      +---------------------+
+| Training pipeline  |----->| model artifacts     |
+| tuning + evaluation|      | metrics + SHAP data |
++---------+----------+      +----------+----------+
+          |                            |
+          |                            |
+          v                            v
++--------------------+      +---------------------+
+| FastAPI service    |      | Streamlit dashboard |
+| auth + rate limit  |      | analyst review UI   |
+| health + metrics   |      | visual triage       |
++--------------------+      +---------------------+
+```
 
-### Building the Classifiers
+More detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
-  * **Gaussian Naive Bayes**: This classifier is a variant of Naive Bayes and is particularly effective with continuous data that follows a Gaussian (normal) distribution. Its simplicity and efficiency make it a great baseline model.
-  * **Decision Tree**: A highly intuitive and powerful classifier, the decision tree creates a tree-like model of decisions. It's known for its ease of implementation and interpretation, making it a popular choice for classification tasks.
-  * **XGBoost (eXtreme Gradient Boosting)**: This is an advanced and highly efficient implementation of gradient boosting. XGBoost builds decision trees sequentially, with each new tree correcting the errors of the previous one. It's renowned for its high performance and ability to handle complex datasets.
+## Dataset and Source
 
-### Ensemble Technique
+The current implementation is built around the KDD Cup / KDD '99 style intrusion detection dataset layout used by the original notebook project.
 
-The project uses a **max-voting ensemble**, a method where multiple models make predictions for each data point. The final prediction is the one that receives the majority of "votes" from the individual models. This approach is highly effective in reducing variance and improving the overall accuracy of the system.
+- Expected raw file path: `data/raw/kddcup.data_10_percent_corrected`
+- Original dataset source: [KDD Cup 1999 Data](http://kdd.ics.uci.edu/databases/kddcup99/kddcup99.html)
+- Current framing in this repository: binary classification (`normal` vs `attack`)
 
------
+Important caveat:
 
-## Results
+- KDD '99 is a useful educational benchmark, but it is not a modern production traffic source.
+- A more credible next step would be to support NSL-KDD, CIC-IDS2017, Zeek logs, or NetFlow-style telemetry.
 
-The results demonstrate that the ensemble model, combining Gaussian Naive Bayes, Decision Tree, and XGBoost, delivers a highly efficient IDS with enhanced performance and a low number of false positives. It's also noteworthy that the **XGBoost classifier alone provides results nearly as effective as the full ensemble model**, showcasing its power as a standalone classifier.
+## My Actual Contributions
 
------
+To keep this repository credible, this section describes the work reflected in the current codebase rather than claiming authorship over the original notebook history.
 
-## Getting Started
+My work in this repository includes:
 
-To get a local copy of this project up and running, follow these simple steps.
+- restructuring the project into `src`, `api`, `dashboard`, `configs`, and `tests`
+- converting the workflow from notebook-first toward reusable Python modules
+- adding a training pipeline with feature engineering, SMOTE, model comparison, and Optuna-based tuning
+- adding a FastAPI inference layer with JWT support, rate limiting, and Prometheus metrics
+- building a Streamlit dashboard for batch review and analyst-facing visualization
+- adding Docker and CI scaffolding
+- improving repository documentation, roadmap visibility, and engineering planning
 
-### Prerequisites
+Work that still needs to be done:
 
-You'll need **Python 3** and the **pip** package manager.
+- strengthen dataset handling and provenance
+- improve test depth beyond smoke-level coverage
+- replace heuristic fallback behavior with stricter service startup guarantees
+- improve deployment realism and monitoring depth
 
-### Installation and Usage
+## Repository Structure
 
-1.  **Create a virtual environment:**
-    ```sh
-    pip install virtualenv
-    virtualenv ids-env
-    source ids-env/bin/activate
-    ```
-2.  **Clone the repository:**
-    ```sh
-    git clone https://github.com/adityanegiuk99/Intrusion-Detection-System-using-ML.git
-    cd Intrusion-Detection-System/
-    ```
-3.  **Install the required packages:**
-    ```sh
-    pip install -r requirements.txt
-    ```
-4.  **Download the dataset:**
-      * Download the dataset from this [link](http://kdd.ics.uci.edu/databases/kddcup99/kddcup.data_10_percent.gz).
-      * Place the downloaded file in the same folder as the project.
-5.  **Run the project:**
-    ```sh
-    jupyter notebook
-    ```
-      * Once Jupyter Notebook opens in your browser, select `IntrusionDetectionSystem.ipynb` to get started\!
+```text
+.
++-- api/                   # FastAPI application
++-- configs/               # YAML configuration
++-- dashboard/             # Streamlit dashboard
++-- data/                  # Dataset location and derived data
++-- docs/                  # Architecture, roadmap, journal, changelog
++-- models/                # Saved artifacts
++-- notebooks/             # Legacy exploration notebooks
++-- src/
+|   +-- inference/
+|   +-- monitoring/
+|   +-- preprocessing/
+|   +-- streaming/
+|   +-- training/
+|   `-- utils/
++-- tests/
++-- Dockerfile
++-- docker-compose.yml
+`-- requirements.txt
+```
 
------
+## Cleaner Organization Recommendations
 
-## About Us
-My name is Aditya Negi. I'm a developer with a strong interest in data science and machine learning, and I'm passionate about using data to build smart, impactful solutions.
-This project was developed by a team of individuals passionate about leveraging machine learning to solve real-world challenges in cybersecurity. Our goal is to create effective and accessible tools that can contribute to a safer digital environment. We believe that projects like this can serve as a valuable resource for students, researchers, and professionals in the fields of data science and network security.
+The current structure is workable, but a cleaner next iteration would be:
+
+```text
+.
++-- api/
++-- dashboard/
++-- configs/
++-- docs/
++-- scripts/
+|   +-- train.ps1
+|   +-- run_api.ps1
+|   `-- run_dashboard.ps1
++-- src/
++-- tests/
++-- data/
+|   +-- sample/
+|   `-- schemas/
++-- artifacts/
+`-- notebooks/
+    `-- legacy/
+```
+
+Why this would help:
+
+- `docs/` keeps project narrative and planning separate from code
+- `scripts/` makes local workflows easier to discover
+- `artifacts/` is a clearer home for generated model output than `models/artifacts`
+- `notebooks/legacy/` makes it obvious which assets are reference material only
+
+## Local Setup
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python -m src.training.trainer --config configs/default.yaml
+uvicorn api.main:app --reload
+```
+
+Run the dashboard:
+
+```bash
+streamlit run dashboard/app.py
+```
+
+Run tests:
+
+```bash
+python -m pytest
+python -m ruff check .
+```
+
+## Weak Spots and Honest Next Steps
+
+These are the current weak points that matter most if this repo is meant to look serious:
+
+1. The dataset is old and the problem framing is still mostly educational.
+2. The API token flow is demo-friendly, not production-grade auth.
+3. The inference service includes a heuristic fallback when model artifacts are missing.
+4. Test coverage is shallow and mostly checks happy paths.
+5. There is no persistent prediction store, audit log backend, or retraining workflow.
+6. The legacy notebooks still exist and can blur the story of where the real application logic lives.
+
+## Roadmap
+
+Short-term roadmap:
+
+- tighten repository structure and docs
+- improve dataset handling and validation
+- add stronger tests and failure-mode handling
+- add artifact/version metadata and reproducibility docs
+- improve service deployment realism
+
+Detailed planning:
+
+- [docs/ROADMAP.md](docs/ROADMAP.md)
+- [docs/BUILD_JOURNAL.md](docs/BUILD_JOURNAL.md)
+- [docs/CHANGELOG.md](docs/CHANGELOG.md)
+- [docs/TIMELINE.md](docs/TIMELINE.md)
+
+## Portfolio-Friendly Follow-Up Repositories
+
+These are realistic spin-off repositories that are genuinely distinct:
+
+1. `ids-model-monitoring`
+   A dedicated monitoring service for drift, latency, alert rates, and model health.
+2. `ids-inference-deployment`
+   A deployment-focused repo with Terraform, Docker, reverse proxying, and cloud rollout.
+3. `ids-data-validation`
+   A pipeline for schema checks, feature contracts, and data quality monitoring.
+4. `ids-experiment-tracking`
+   MLflow or Weights & Biases based experiment tracking and model registry workflows.
+5. `ids-frontend-console`
+   A React-based SOC-style frontend replacing the Streamlit prototype.
+
+## License
+
+This project is released under the terms of the [LICENSE](LICENSE).

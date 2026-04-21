@@ -1,0 +1,8 @@
+[tool.ruff]
+exclude = [
+  ".git",
+  ".pytest_cache",
+  "notebooks",
+  "*.ipynb",
+]
+

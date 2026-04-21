@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+pytest-cache-files-*/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local data and model outputs
+models/artifacts/*.joblib
+models/artifacts/*.json
+models/artifacts/*.png
+models/artifacts/*.md
+data/raw/
+data/processed/
+
+# Environment files
+.env
+.env.*
+
+# IDE / OS files
+.vscode/
+.DS_Store
+Thumbs.db
