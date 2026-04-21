@@ -12,6 +12,7 @@ from src.preprocessing.pipeline import prepare_inference_frame
 class IDSInferenceService:
     def __init__(self, artifact_path: str | Path, drift_threshold: float) -> None:
         path = Path(artifact_path)
+        self.artifact_path = path
         self.artifacts: dict[str, Any] | None = joblib.load(path) if path.exists() else None
         self.drift_threshold = drift_threshold
 
@@ -41,6 +42,26 @@ class IDSInferenceService:
                 }
             )
         return outputs
+
+    def get_model_info(self) -> dict[str, Any]:
+        if self.artifacts is None:
+            return {
+                "status": "fallback_mode",
+                "artifact_loaded": False,
+                "threshold": None,
+                "labels": None,
+                "selected_feature_count": 0,
+                "top_features": [],
+            }
+
+        return {
+            "status": "ready",
+            "artifact_loaded": True,
+            "threshold": self.artifacts.get("threshold"),
+            "labels": self.artifacts.get("labels"),
+            "selected_feature_count": len(self.artifacts.get("selected_feature_names", [])),
+            "top_features": self.artifacts.get("shap_importance", [])[:5],
+        }
 
     def _fallback_predictions(self, frame):
         outputs = []

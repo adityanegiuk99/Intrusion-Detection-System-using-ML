@@ -18,6 +18,7 @@ from src.utils.logging import configure_logging
 from src.utils.schemas import (
     BatchPredictionRequest,
     BatchPredictionResponse,
+    ModelInfoResponse,
     PredictionResponse,
     TokenResponse,
     TrafficRecord,
@@ -61,7 +62,12 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security_sc
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "model": "loaded"}
+    return {"status": "ok", "model": "loaded" if service.artifacts is not None else "fallback_mode"}
+
+
+@app.get("/model_info", response_model=ModelInfoResponse)
+def model_info(_: str = Depends(verify_token)) -> ModelInfoResponse:
+    return ModelInfoResponse(**service.get_model_info())
 
 
 @app.post("/token", response_model=TokenResponse)

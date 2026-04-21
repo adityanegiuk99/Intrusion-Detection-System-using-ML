@@ -64,3 +64,14 @@ def test_token_generation():
     token = create_access_token("tester")
     assert isinstance(token, str)
 
+
+def test_model_info_endpoint_requires_auth_and_returns_state():
+    unauthorized = client.get("/model_info")
+    assert unauthorized.status_code == 403
+
+    token = create_access_token("tester")
+    authorized = client.get("/model_info", headers={"Authorization": f"Bearer {token}"})
+    assert authorized.status_code == 200
+    payload = authorized.json()
+    assert "artifact_loaded" in payload
+    assert "status" in payload

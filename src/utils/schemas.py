@@ -70,3 +70,11 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
+
+class ModelInfoResponse(BaseModel):
+    status: str
+    artifact_loaded: bool
+    threshold: float | None = None
+    labels: dict[int, str] | None = None
+    selected_feature_count: int = 0
+    top_features: list[dict[str, Any]]
