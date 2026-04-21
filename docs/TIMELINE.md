@@ -25,6 +25,8 @@ Planned deliverables:
 - architecture, roadmap, changelog, and build journal docs
 - timeline doc and issue templates
 - `.env.example` and config notes
+- helper scripts for training, API startup, and dashboard launch
+- sample API payloads for local testing and screenshots
 - notebook labeling or relocation into a legacy area
 
 Commit ideas:

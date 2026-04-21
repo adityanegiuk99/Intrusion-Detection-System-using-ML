@@ -20,7 +20,7 @@ The longer-term objective is to move from offline dataset classification toward 
 
 - Config-driven preprocessing, feature engineering, feature selection, and SMOTE-based class balancing
 - Model comparison across Random Forest, XGBoost, LightGBM, and a soft-voting ensemble
-- FastAPI endpoints for health, single prediction, batch prediction, metrics, and token generation
+- FastAPI endpoints for health, model metadata, single prediction, batch prediction, metrics, and token generation
 - A Streamlit dashboard for analyst review and batch triage
 - A streaming simulator that replays records through the shared inference layer
 - Basic drift scoring based on feature distribution shifts
@@ -166,6 +166,32 @@ Run tests:
 python -m pytest
 python -m ruff check .
 ```
+
+Helper scripts:
+
+```powershell
+./scripts/train.ps1
+./scripts/run_api.ps1
+./scripts/run_dashboard.ps1
+```
+
+Sample request bodies:
+
+- [data/sample/predict_request.json](data/sample/predict_request.json)
+- [data/sample/batch_predict_request.json](data/sample/batch_predict_request.json)
+
+Useful API endpoints:
+
+- `GET /health`
+- `GET /model_info`
+- `POST /token`
+- `POST /predict`
+- `POST /batch_predict`
+
+Environment setup:
+
+- copy `.env.example` to `.env`
+- set `IDS_JWT_SECRET` before running the API outside local demo use
 
 ## Weak Spots and Honest Next Steps
 
